@@ -20,7 +20,7 @@ def load_data(start=0, end=10000, path="data/yelp_academic_dataset_review.json")
     return df
 
 
-# text clustering
+# text embeddings
 def load_embeddings(dataframe, column):
     embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
     messages = np.asarray(dataframe[column])
