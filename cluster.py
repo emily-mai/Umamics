@@ -28,29 +28,6 @@ def gmm_model_selection(n_clusters, X):
     return best_gmm, bic
 
 
-def anamoly_detection(posterior, threshold):
-    n, k = posterior.shape
-    max_posterior = np.amax(posterior, axis=1)
-    # TODO: get anomalies
-
-
-def plot_tsne(gmm, X, Y):
-    # dimensionality reduction
-    x_reduced = TSNE(n_components=2).fit_transform(X)
-
-    # plot points and their respective colors according to cluster
-    color_iter = itertools.cycle(['navy', 'turquoise', 'cornflowerblue', 'darkorange'])
-    for i, (mean, color) in enumerate(zip(gmm.means_, color_iter)):
-        if not np.any(Y == i):
-            continue
-        plt.scatter(x_reduced[Y == i, 0], x_reduced[Y == i, 1], .8, color=color)
-
-    plt.xticks(())
-    plt.yticks(())
-    plt.title(f'Selected GMM: {gmm.covariance_type} model, 'f'{gmm.n_components} components')
-    plt.show()
-
-
 # clustering using DBSCAN
 # grid search hyper-parameters and return best model and scores
 def dbscan_model_selection(X):
@@ -71,24 +48,37 @@ def dbscan_model_selection(X):
     return best_db, scores
 
 
+def plot_tsne(gmm, X, Y):
+    # dimensionality reduction
+    x_reduced = TSNE(n_components=2).fit_transform(X)
+
+    # plot points and their respective colors according to cluster
+    color_iter = itertools.cycle(['navy', 'turquoise', 'cornflowerblue', 'darkorange'])
+    for i, (mean, color) in enumerate(zip(gmm.means_, color_iter)):
+        if not np.any(Y == i):
+            continue
+        plt.scatter(x_reduced[Y == i, 0], x_reduced[Y == i, 1], .8, color=color)
+
+    plt.xticks(())
+    plt.yticks(())
+    plt.title(f'Selected GMM: {gmm.covariance_type} model, 'f'{gmm.n_components} components')
+    plt.show()
+
+
 if __name__ == "__main__":
     # load data for one business
     data = pd.read_pickle("data/data.pkl")
-    data = data[data["business_id"] == "v1UzkU8lEWdjxq8byWFOKg"]
+    data = data[data["business_id"] == "bZiIIUcpgxh8mpKMDhdqbA"]
     X = np.array(data["embedding"].tolist())
 
     # run once to get best model
-    # best_gmm, bic = gmm_model_selection(10, X)
+    best_gmm, bic = gmm_model_selection(10, X)
 
-    # fit and predict GMM on data
+    # fit and predict models on data
+    # best_db, scores = dbscan_model_selection(X)
     best_gmm = GaussianMixture(n_components=4, covariance_type='diag').fit(X)
     Y = best_gmm.predict(X)
 
-    # get posterior distribution of p(yi=c|xi) for each cluster c and data xi
-    posterior = best_gmm.predict_proba(X)
-    anamoly_detection(posterior, threshold=0.1)
-
     # generate plot using TSNE
-    # plot_tsne(best_gmm, X, Y)
+    plot_tsne(best_gmm, X, Y)
 
-    # best_db, scores = dbscan_model_selection(X)

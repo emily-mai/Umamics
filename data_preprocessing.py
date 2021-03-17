@@ -20,7 +20,7 @@ def load_data(start=0, end=10000, path="data/yelp_academic_dataset_review.json")
     return df
 
 
-# text embeddings
+# embed reviews for clustering
 def load_embeddings(dataframe, column):
     embed = hub.load("https://tfhub.dev/google/universal-sentence-encoder/4")
     messages = np.asarray(dataframe[column])
@@ -29,6 +29,7 @@ def load_embeddings(dataframe, column):
     return messages, embeddings
 
 
+# show embedded reviews
 def show_embeddings(n, reviews, embeddings):
     # print first n review embeddings
     for i, message_embedding in enumerate(embeddings[:n]):
@@ -39,6 +40,7 @@ def show_embeddings(n, reviews, embeddings):
         print("Embedding: [{}, ...]\n".format(message_embedding_snippet))
 
 
+# process batches of data
 def batch_process(step=10000, stop=50000):
     review_df = pd.DataFrame()
     # generate ranges (i.e. [(0,1000), (1000,2000), ...]
@@ -59,4 +61,9 @@ def batch_process(step=10000, stop=50000):
 
 
 if __name__ == "__main__":
-    batch_process()
+    # run this is you have dataset
+    # batch_process()
+
+    # run this if you have pkl file
+    data = pd.read_pickle("data/data.pkl")
+    print(data.head())
